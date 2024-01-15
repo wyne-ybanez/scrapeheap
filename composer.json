@@ -4,7 +4,6 @@
     "require": {
         "spatie/browsershot": "^4.0",
         "symfony/var-dumper": "^7.0",
-        "fabpot/goutte": "^4.0",
         "spatie/crawler": "^8.1",
         "roach-php/core": "^3.0",
         "phpoffice/phpword": "^1.2",
