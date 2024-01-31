@@ -46,8 +46,16 @@ class Document
         $section->addLink($target_url, 'View Page');
         $section->addTextBreak(2);
 
+        $domain = parse_url($target_url, PHP_URL_HOST);
+        $path = "output/{$domain}/";
+
         // Save file
-        $objWriter = IOFactory::createWriter($phpWord, 'Word2007');
-        $objWriter->save("output/{$title}.docx");
+        if (!file_exists($path)) {
+            mkdir($path, 0755, true);
+        }
+
+        $objWriter = IOFactory::createWriter($phpWord, 'HTML');
+
+        $objWriter->save("{$path}{$title}.docx");
     }
 }

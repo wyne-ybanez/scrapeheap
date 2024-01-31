@@ -17,6 +17,13 @@ class Spider extends BasicSpider
     ];
 
     /**
+     * Keeps track of links that have already been crawled.
+     *
+     * @var array
+     */
+    public array $crawled = [];
+
+    /**
      * @var string
      */
     public string $base_domain;
@@ -34,23 +41,38 @@ class Spider extends BasicSpider
 
         if ($links) {
             foreach ($links as $link) {
-                yield $this->request('GET', $link->getUri(), 'parsePage');
+                if (!in_array($link->getUri(), $this->crawled)) {
+                    if ($this->checkUrl($link)) {
+                        yield $this->request('GET', $link->getUri(), 'parsePage');
+                    }
+                } else {
+                    array_push($this->crawled, $link->getUri());
+                }
             }
         }
     }
 
     /**
-     * Determines if the url is internal and a valid http/s url.
+     * Determines if the url is internal and a probably valid http/s url.
      *
      * @param object $link
      * @return boolean
      */
     private function checkUrl(object $link): bool
     {
+        // does it look like a url
         if (!parse_url($link->getUri(), PHP_URL_SCHEME) && parse_url($link->getUri(), PHP_URL_HOST)) {
             return false;
         }
 
+        // does it start with http/s
+        $pattern = '/(http[s]?\:\/\/)?(?!\-)(?:[a-zA-Z\d\-]{0,62}[a-zA-Z\d]\.){1,126}(?!\d+)[a-zA-Z\d]{1,63}/';
+
+        if (!preg_match($pattern, $link->getUri())) {
+            return false;
+        };
+
+        //does the host match the base url host
         $domain = parse_url($link->getUri(), PHP_URL_HOST);
 
         if ($domain !== $this->context['base_domain']) {
@@ -71,6 +93,7 @@ class Spider extends BasicSpider
 
         $title = 'default';
         $content = 'default';
+
         $current_uri = $response->getUri();
 
         if ($response->filter('title')->count() > 0) {
@@ -95,16 +118,15 @@ class Spider extends BasicSpider
 
         $links = $response->filter('a')->links();
 
-        $crawled = [];
 
         if ($links) {
             foreach ($links as $link) {
-                if ($this->checkUrl($link)) {
-                    if (!in_array($link->getUri(), $crawled)) {
+                if (!in_array($link->getUri(), $this->crawled)) {
+                    if ($this->checkUrl($link)) {
                         yield $this->request('GET', $link->getUri(), 'parsePage');
-                    } else {
-                        array_push($crawled, $link->getUri());
                     }
+                } else {
+                    array_push($this->crawled, $link->getUri());
                 }
             }
         }

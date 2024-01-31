@@ -10,9 +10,14 @@ use RoachPHP\Spider\Configuration\Overrides;
 class Scrapeheap
 {
 
-    public function scrape($target_url)
+    /**
+     * Let's scrape.
+     *
+     * @param string $target_url
+     * @return void
+     */
+    public function scrape(string $target_url): void
     {
-
         $base_domain = parse_url($target_url, PHP_URL_HOST);
 
         Roach::startSpider(
