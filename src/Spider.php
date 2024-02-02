@@ -66,6 +66,7 @@ class Spider extends BasicSpider
         }
 
         // does it start with http/s
+        // TODO: some testing proves this scraper only takes urls with 'http' not 'https'
         $pattern = '/(http[s]?\:\/\/)?(?!\-)(?:[a-zA-Z\d\-]{0,62}[a-zA-Z\d]\.){1,126}(?!\d+)[a-zA-Z\d]{1,63}/';
 
         if (!preg_match($pattern, $link->getUri())) {
@@ -102,13 +103,18 @@ class Spider extends BasicSpider
         }
 
         if ($response->filter('body')->count() > 0) {
+            $response
+                ->filter('body nav, body script, body style, body footer, body noscript, div.elementor-location-header, div.elementor-lcoation-footer') //what we dont want to see
+                ->each(function ($html_tag) {
+                    $html_tag->getNode(0)->parentNode->removeChild($html_tag->getNode(0)); // remove these elements from DOM
+                });
 
-            $content = $response
-                ->filter('body')
-                ->text();
+            $content = $response->filter('body')->text();
+
+            dump($content);
         }
 
-        Document::make($current_uri, $title, $content);
+        //Document::make($current_uri, $title, $content);
 
         yield $this->item([
             'title' => $title,

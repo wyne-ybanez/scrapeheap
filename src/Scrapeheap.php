@@ -20,12 +20,24 @@ class Scrapeheap
     {
         $base_domain = parse_url($target_url, PHP_URL_HOST);
 
-        Roach::startSpider(
-            Spider::class,
-            new Overrides(startUrls: [$target_url]),
-            context: ['base_domain' => $base_domain],
-        );
+        try {
+            Roach::startSpider(
+                Spider::class,
+                new Overrides(startUrls: [$target_url]),
+                context: ['base_domain' => $base_domain],
+            );
+        }
+        catch (\Exception $e) {
+            echo 'Caught exception: ', $e->getMessage(), "\n";
+        }
 
-        echo "all done!";
+        echo '<h3>All Done!</h3>';
+        echo 'You scraped: ' . $target_url;
+        echo '
+        <form action="action.php" method="post">
+            <label for="target_url">Scrape again - Target URL</label>
+            <input type="url" name="target_url" id="target_url">
+            <input type="submit" value="Scrape">
+        </form>';
     }
 }

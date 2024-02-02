@@ -54,7 +54,7 @@ class Document
             mkdir($path, 0755, true);
         }
 
-        $objWriter = IOFactory::createWriter($phpWord, 'HTML');
+        $objWriter = IOFactory::createWriter($phpWord, 'Word2007');
 
         $objWriter->save("{$path}{$title}.docx");
     }
