@@ -27,7 +27,7 @@ Right now this version of scrapeheap is at it's infancy. Don't expect any fancy 
 ## Local Deployment
 
 1. Download/Clone the project
-2. Install dependencies by running `composer install && npm instsall`
+2. Install dependencies by running `composer install && npm install`
 3. Ensure you put put the project where your valet has been parked in
 4. Access the project locally via Valet at http://scrapeheap.test
 
