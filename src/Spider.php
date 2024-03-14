@@ -65,8 +65,7 @@ class Spider extends BasicSpider
             return false;
         }
 
-        // does it start with http/s
-        // TODO: some testing proves this scraper only takes urls with 'http' not 'https'
+        // does it start with http(s)
         $pattern = '/(http[s]?\:\/\/)?(?!\-)(?:[a-zA-Z\d\-]{0,62}[a-zA-Z\d]\.){1,126}(?!\d+)[a-zA-Z\d]{1,63}/';
 
         if (!preg_match($pattern, $link->getUri())) {

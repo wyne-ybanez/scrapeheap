@@ -18,18 +18,18 @@ class Document
      */
     public static function make(string $target_url, string $title, string $content): void
     {
-        $phpWord = new PhpWord;
+        $phpWordTemplate = new PhpWord;
 
         Settings::setOutputEscapingEnabled(true);
 
-        $phpWord->addTitleStyle(
+        $phpWordTemplate->addTitleStyle(
             1,
             ['bold' => true, 'size' => 32],
             ['spaceAfter' => 640]
         );
 
         // New portrait section
-        $section = $phpWord->addSection();
+        $section = $phpWordTemplate->addSection();
 
         // Simple text
         $section->addTitle($title, 1);
@@ -47,15 +47,44 @@ class Document
         $section->addTextBreak(2);
 
         $domain = parse_url($target_url, PHP_URL_HOST);
-        $path = "output/{$domain}/";
 
-        // Save file
+       // Save files
+       $pathDocx = "output/Docx/{$domain}/";
+       self::saveDocx($phpWordTemplate, $pathDocx, $title);
+
+       $pathHTML = "output/HTML/{$domain}/";
+       self::saveHTML($phpWordTemplate, $pathHTML, $title);
+    }
+
+    /**
+     * Saves into HTML Document
+     *
+     * @param  $phpWordTemplate
+     * @param  $path
+     * @param  $title
+     * @return void
+     */
+    public static function saveHTML($phpWordTemplate, $path, $title) {
         if (!file_exists($path)) {
             mkdir($path, 0755, true);
         }
+        $objWriter = IOFactory::createWriter($phpWordTemplate, 'HTML');
+        $objWriter->save("{$path}{$title}.html");
+    }
 
-        $objWriter = IOFactory::createWriter($phpWord, 'Word2007');
-
+    /**
+     * Saves as Word Doc
+     *
+     * @param  $phpWordTemplate
+     * @param  $path
+     * @param  $title
+     * @return void
+     */
+    public static function saveDocx($phpWordTemplate, $path, $title) {
+        if (!file_exists($path)) {
+            mkdir($path, 0755, true);
+        }
+        $objWriter = IOFactory::createWriter($phpWordTemplate, 'Word2007');
         $objWriter->save("{$path}{$title}.docx");
     }
 }
